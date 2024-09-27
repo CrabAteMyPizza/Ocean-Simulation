@@ -1,0 +1,102 @@
+#version 330 core
+out vec4 FragColor;
+
+struct Material {
+    vec3 diffuse;
+    vec3 specular;
+    float shininess;
+};
+uniform Material material;
+
+struct DirLight {
+    vec3 direction;
+    vec3 camPos;
+  
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+};  
+uniform DirLight dirLight;
+
+uniform sampler2D waveNRM_0;
+uniform sampler2D waveNRM_1;
+uniform sampler2D waveNRM_2;
+uniform sampler2D waveNRM_3;
+uniform samplerCube reflectSampler;
+
+vec3 CalcDirLight(DirLight light, vec3 normal, vec3 fragPos);
+
+in float Time;
+in vec3 normal;
+in vec3 tangent;
+in vec3 bitangent;
+in vec3 fragPos;
+in vec2 tCoord;
+
+void main()
+{
+    mat3 tbnMat = mat3(normalize(tangent), normalize(bitangent), normalize(normal));
+
+    vec3 normMed = texture(waveNRM_0, vec2(tCoord.x - 0.713647, tCoord.y + 0.700505) + (0.022 * Time)).rgb;
+    vec3 normLarge = texture(waveNRM_1, vec2(tCoord.x + 0.556502, tCoord.y - 0.830846) + (0.042 * Time)).rgb;
+    vec3 normFast = texture(waveNRM_2, vec2(tCoord.x - 0.933857, tCoord.y - 0.357647) + (0.1 * Time)).rgb;
+    vec3 normFast2 = texture(waveNRM_3, vec2(tCoord.x + 0.66896473162, tCoord.y - 0.74329414624717) + (0.09 * Time)).rgb;
+
+    normMed = normalize(vec3(normMed.x, normMed.y, max(pow(normMed.z, 3.0), 1.0)) * 2.0 - 1.0);
+    normLarge = normalize(vec3(normLarge.x, normLarge.y, max(pow(normLarge.z, 3.0), 1.0)) * 2.0 - 1.0);
+    normFast = normalize(normFast * 2.0 - 1.0);
+    normFast2 = normalize(normFast2 * 2.0 - 1.0);
+    
+
+    normMed = tbnMat * normMed;
+    normLarge = tbnMat * normLarge;
+    normFast = tbnMat * normFast;
+    normFast2 = tbnMat * normFast2;
+
+    vec3 norm = normalize(normal + normalize(normMed) + normalize(normLarge) + normalize(normFast) + normalize(normFast2));
+
+    vec3 result = CalcDirLight(dirLight, norm, fragPos);
+    FragColor = vec4(result, 1.0);
+} 
+
+vec3 CalcDirLight(DirLight light, vec3 normal, vec3 fragPos) {
+    vec3 lightDir = normalize(-light.direction);
+    vec3 viewDir = normalize(light.camPos - fragPos);
+    vec3 halfwayVec = normalize(viewDir + lightDir);
+    vec3 reflectVec = normalize(reflect(-viewDir, normal));
+    vec3 refractVec = refract(-viewDir, normal, 0.75187);
+
+    float diff = max(dot(lightDir, normal), 0.0);
+
+    float exp = pow(1 - max(dot(normal, viewDir), 0.0), 5.0);
+    float fresnelComp = exp + (0.03 * (1 - exp));
+    float spec = pow(max(dot(normal, halfwayVec), 0.0), material.shininess) * fresnelComp;
+
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+
+    ambient  = light.ambient * pow(material.diffuse, vec3(0.45));
+    diffuse  = light.diffuse * mix((pow(material.diffuse, vec3(0.45)) * diff), (texture(reflectSampler, reflectVec).rgb * 0.7), fresnelComp);
+    specular = light.specular * mix((pow(material.specular, vec3(0.45)) * spec), (texture(reflectSampler, reflectVec).rgb * 0.7), fresnelComp);
+
+    //Foam Generation. But unfortunately never looked that good.
+    /*vec3 worldUp = vec3(0.0, 1.0, 0.0);
+    float steepDot = dot(worldUp, abs(normal)); 
+    
+    if(false){
+        customMatVal[0] = material.diffuse + (((1 - material.diffuse) * steepDot) + 0.2);
+        customMatVal[1] = material.specular + ((1 - material.specular) * steepDot);
+
+        ambient  = light.ambient  * mix(texture(reflectSampler, refractVec).rgb, mix(texture(reflectSampler, reflectVec).rgb, customMatVal[0], 0.77 + (0.23 * steepDot)), 0.8 + (0.2 * steepDot));
+        diffuse  = light.diffuse  * mix(texture(reflectSampler, refractVec).rgb, mix(texture(reflectSampler, reflectVec).rgb, (customMatVal[0] * foamDiff), 0.77 + (0.23 * steepDot)), 0.8 + (0.2 * steepDot));
+        specular = light.specular * mix(texture(reflectSampler, refractVec).rgb, mix(texture(reflectSampler, reflectVec).rgb, (customMatVal[1] * spec), 0.6 + (0.4 * steepDot)), 0.8 + (0.2 * steepDot));
+    }
+    else {
+        ambient  = light.ambient * pow(material.diffuse, vec3(0.45));
+        diffuse  = light.diffuse * mix(texture(reflectSampler, reflectVec).rgb, (pow(material.diffuse, vec3(0.45)) * diff), 0.85 - (0.45 * (1 - dot(normal, viewDir))));
+        specular = light.specular * mix(texture(reflectSampler, reflectVec).rgb, (pow(material.specular, vec3(0.45)) * spec), 0.7 - (0.45 * (1 - dot(normal, viewDir))));
+    }*/
+
+    return (ambient + diffuse + specular);
+}

@@ -1,0 +1,89 @@
+#version 330 core
+
+#define TAU 6.28318530718
+
+layout (location = 0) in vec3 aPos;
+layout (location = 1) in vec2 texCoord;
+
+uniform vec2 Directions[64];
+uniform vec4 waveParams[64];
+uniform mat4 project;
+uniform mat4 model;
+uniform mat4 view;
+uniform float time;
+
+out float Time;
+out vec2 tCoord;
+out vec3 normal;
+out vec3 tangent;
+out vec3 bitangent;
+out vec3 fragPos;
+
+float InvCosine(float amplitude, float spatialFreq, vec2 Direction, vec3 aPos, float time, float angularFreq);
+float InvSine(float amplitude, float spatialFreq, vec2 Direction, vec3 aPos, float time, float angularFreq);
+float termMultiplier(float spatialFreq, float direction);
+
+void main()
+{
+    //Calculating sum of sines and sum of cosines
+    //also calculating the wave derivatives for normals 
+    vec2 sumOfWaves = vec2(0.0);
+    vec4 derivSum = vec4(0.0);
+
+    for(int i = 0; i < 64; i++) {
+        vec2 curDirection = normalize(Directions[i]);
+        sumOfWaves.x += waveParams[i].w * InvSine(waveParams[i].x, waveParams[i].y, curDirection, aPos, time, waveParams[i].z);
+        sumOfWaves.y += InvCosine(waveParams[i].x, waveParams[i].y, curDirection, aPos, time, waveParams[i].z);
+
+        derivSum.x += termMultiplier(waveParams[i].y, curDirection.x) * InvSine(waveParams[i].x, waveParams[i].y, curDirection, aPos, time, waveParams[i].z);
+        derivSum.y += waveParams[i].w * termMultiplier(waveParams[i].y, curDirection.x) * InvCosine(waveParams[i].x, waveParams[i].y, curDirection, aPos, time, waveParams[i].z);
+        derivSum.z += termMultiplier(waveParams[i].y, curDirection.y) * InvSine(waveParams[i].x, waveParams[i].y, curDirection, aPos, time, waveParams[i].z);
+        derivSum.w += waveParams[i].w * termMultiplier(waveParams[i].y, curDirection.y) * InvCosine(waveParams[i].x, waveParams[i].y, curDirection, aPos, time, waveParams[i].z);
+    }
+
+    vec3 curPos = vec3(1.0);
+    curPos.x = aPos.x + sumOfWaves.x;
+    curPos.y = aPos.y - sumOfWaves.y;
+    curPos.z = aPos.z + sumOfWaves.x;
+    
+    //Correct normals with partial derivative
+    //The result is good normals
+    //Remember that OpenGL uses right hand coordinates Z+ is heading towards you
+
+    vec3 tempNorm = vec3(1.0);
+    vec3 tempTan = vec3(1.0);
+    vec3 tempBit = vec3(1.0);
+
+    tempNorm.x = (derivSum.z * derivSum.y) - (derivSum.w * derivSum.x) - (derivSum.x);
+    tempNorm.y = 1 + derivSum.w + derivSum.y;
+    tempNorm.z = (derivSum.y * derivSum.z) - (derivSum.z * derivSum.w) - (derivSum.z);
+
+    tempTan.x = derivSum.w;
+    tempTan.y = derivSum.z;
+    tempTan.z = derivSum.w + 1;
+
+    tempBit.x = 1 + derivSum.y;
+    tempBit.y = derivSum.x;
+    tempBit.z = derivSum.y;
+
+    //All the final results
+    tCoord = texCoord;
+    normal = normalize(tempNorm);
+    tangent = normalize(tempTan);
+    bitangent = normalize(tempBit);
+    fragPos = curPos;
+    Time = time;
+    gl_Position = project * view * vec4(curPos, 1.0f);
+}
+
+float InvCosine(float amplitude, float spatialFreq, vec2 Direction, vec3 aPos, float time, float angularFreq) {
+    return (amplitude * cos((spatialFreq * ((Direction.x * aPos.x) + (Direction.y * aPos.z))) - (time * angularFreq)));
+}
+
+float InvSine(float amplitude, float spatialFreq, vec2 Direction, vec3 aPos, float time, float angularFreq) {
+    return (amplitude * sin((spatialFreq * ((Direction.x * aPos.x) + (Direction.y * aPos.z))) - (time * angularFreq)));
+}
+
+float termMultiplier(float spatialFreq, float direction) {
+    return (spatialFreq * direction);
+}

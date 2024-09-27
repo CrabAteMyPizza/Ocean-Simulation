@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33213.308
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GerstnerWave", "GerstnerWave\GerstnerWave.vcxproj", "{F389AA43-5021-4B01-8BA6-8538DA7F5C65}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F389AA43-5021-4B01-8BA6-8538DA7F5C65}.Debug|x64.ActiveCfg = Debug|x64
+		{F389AA43-5021-4B01-8BA6-8538DA7F5C65}.Debug|x64.Build.0 = Debug|x64
+		{F389AA43-5021-4B01-8BA6-8538DA7F5C65}.Debug|x86.ActiveCfg = Debug|Win32
+		{F389AA43-5021-4B01-8BA6-8538DA7F5C65}.Debug|x86.Build.0 = Debug|Win32
+		{F389AA43-5021-4B01-8BA6-8538DA7F5C65}.Release|x64.ActiveCfg = Release|x64
+		{F389AA43-5021-4B01-8BA6-8538DA7F5C65}.Release|x64.Build.0 = Release|x64
+		{F389AA43-5021-4B01-8BA6-8538DA7F5C65}.Release|x86.ActiveCfg = Release|Win32
+		{F389AA43-5021-4B01-8BA6-8538DA7F5C65}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A46F0576-423D-449C-A80F-F2ACC5D19D82}
+	EndGlobalSection
+EndGlobal

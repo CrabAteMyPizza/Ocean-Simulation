@@ -1,0 +1,12 @@
+#version 330 core
+
+in vec3 textureDir; //Equivalent texture coordinate in 3d textures
+
+uniform samplerCube skyBox; 
+
+out vec4 FragColor;
+
+void main()
+{             
+    FragColor = texture(skyBox, normalize(textureDir));
+}  
