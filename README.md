@@ -1,10 +1,15 @@
 # Ocean Simulation
 
-Implementation of Gerstner waves from Nvidia GPU Gems Chapter 1 and Fournier Paper. Using Opengl and C++. The top image using 64 waves the bottom uses 32 waves.
+Implementation of Gerstner waves from Nvidia GPU Gems Chapter 1 and Fournier Paper. Using Opengl and C++. The images used 64 waves, the breakers uses 32 waves.
 
-![alt text](https://i.imgur.com/C80R4hU.png "Sunset")
+![alt text](https://i.imgur.com/CP2bJkW.png "Calm Sunset")
+
+![alt text](https://i.imgur.com/gGZcrh1.png "Calm Noon")
+
+![alt text](https://i.imgur.com/C80R4hU.png "Rough Sunset")
 
 ![alt text](https://i.imgur.com/F6Oj2rl.png "Breaker")
+
 ## Features
 + Blinn - Phong Shading
 + Gamma Correction
