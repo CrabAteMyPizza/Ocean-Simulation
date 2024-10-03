@@ -1,43 +1,60 @@
 To get the normals ive tried finite Difference but mainly i averaged normals from nearby triangles the result is distorted AF
 heres the actual code
 
-vec3 tempNorm = vec3(1.0);
-    //vec3 adjVec[6];
-    //vec2 sumOfAdjWaves[6];
-    //vec2 transform[6];
+//Parameters for calm Ocean
 
-    tempNorm.x = derivSum.x + (derivSum.x * derivSum.w) - (derivSum.y * derivSum.z);
-    tempNorm.y = -1 - derivSum.y - derivSum.w;
-    tempNorm.z = (-1 * (derivSum.x * derivSum.w)) + derivSum.z + (derivSum.y * derivSum.z);
+big waves
+startRef = glm::vec4(0.325f / 2.5, 0.28318530718f, sqrt(9.8 * 0.28318530718f), 0.8);
+endRef = glm::vec4(0.125f / 2.5, 0.5318530718f, sqrt(9.8 * 0.5318530718f), 0.8);
 
-    //Staticaly store the transformations. Sacrificing memory for just sliver of speed LOL
-    //(up, upRight, right, down, downLeft, left)
-    /*transform[0] = vec2(0.0, -0.0005);
-    transform[1] = vec2(0.0005, -0.0005);
-    transform[2] = vec2(0.0005, 0.0);
-    transform[3] = vec2(0.0, 0.0005);
-    transform[4] = vec2(-0.0005, 0.0005);
-    transform[5] = vec2(-0.0005, 0.0);
+small waves
+glm::vec4 startRef = glm::vec4(0.0105f / 2.5, 2.08318530718f / 2.0, sqrt(9.8 * 2.08318530718f / 2.0), 1.0);
+glm::vec4 endRef = glm::vec4(0.0025f / 2.5, 6.28318530718f / 2.0, sqrt(9.8 * 6.28318530718f / 2.0), 1.0);
 
-    for(int i = 0; i < 6; i++) {
-        adjVec[i] = vec3(0.0);
-        sumOfAdjWaves[i] = vec2(0.0);
-        for(int j = 0; j < 6; j++) {
-            sumOfAdjWaves[i].x += InvSine(waveParams[j].x, waveParams[j].y, normalize(Directions[j]), vec3((curPos.x + transform[i].x), aPos.y, (curPos.z + transform[i].y)), time, waveParams[j].z);
-            sumOfAdjWaves[i].y += InvCosine(waveParams[j].x, waveParams[j].y, normalize(Directions[j]), vec3((curPos.x + transform[i].x), aPos.y, (curPos.z + transform[i].y)), time, waveParams[j].z);
-        }
+//Original
+glm::vec4 startRef = glm::vec4(0.105f / 3.0, 2.08318530718f / 3.2, sqrt(9.8 * 2.08318530718f / 3.2), 0.9);
+glm::vec4 endRef = glm::vec4(0.015f / 3.0, 6.28318530718f / 3.2, sqrt(9.8 * 6.28318530718f / 3.2), 0.9);
 
-        adjVec[i].x = transform[i].x + sumOfAdjWaves[i].x;
-        adjVec[i].y = sumOfAdjWaves[i].y * -1;
-        adjVec[i].z = transform[i].y + sumOfAdjWaves[i].x;
-    }
-    
-    //Normals of each triangles
-    vec3 t1Normal = normalize(cross(adjVec[1], adjVec[0]));
-    vec3 t2Normal = normalize(cross(adjVec[2], adjVec[1]));
-    vec3 t3Normal = normalize(cross(adjVec[3], adjVec[2]));
-    vec3 t4Normal = normalize(cross(adjVec[4], adjVec[3]));
-    vec3 t5Normal = normalize(cross(adjVec[5], adjVec[4]));
-    vec3 t6Normal = normalize(cross(adjVec[0], adjVec[5]));
+srand(time(NULL));
+std::fstream curFileDirect, curFileWaveParam;
+curFileDirect.open("stdDefaultsDirect.txt", std::fstream::out);
+curFileWaveParam.open("stdDefaultsParam.txt", std::fstream::out);
 
-    tempNorm = t1Normal + t2Normal + t3Normal + t4Normal + t5Normal + t6Normal;*/
+glm::vec4 startRef = glm::vec4(0.105f / 3.0, 2.08318530718f / 3.2, sqrt(9.8 * 2.08318530718f / 3.2), 0.9);
+glm::vec4 endRef = glm::vec4(0.015f / 3.0, 6.28318530718f / 3.2, sqrt(9.8 * 6.28318530718f / 3.2), 0.9);
+float rad;
+
+for (int i = 0; i < 60; i++) {
+	rad = static_cast<float> (((rand() % 211) - 105) + ((static_cast <float> (rand())) / static_cast <float> (RAND_MAX)));
+	directions[i] = glm::mat2(glm::vec2(glm::cos(glm::radians(rad)), glm::sin(glm::radians(rad))), glm::vec2(-glm::sin(glm::radians(rad)), glm::cos(glm::radians(rad)))) * glm::vec2(1.0, 1.0);
+	curFileDirect << "defDirections[" << i << "] = " << "glm::vec2(" << directions[i].x << ", " << directions[i].y << "),\n";
+
+	waveParams[i].x = std::lerp(startRef.x, endRef.x, (static_cast<float> (i) / 60.0f));
+	waveParams[i].y = std::lerp(startRef.y, endRef.y, (static_cast<float> (i) / 60.0f));
+
+	waveParams[i].z = sqrt(9.8 * waveParams[i].y);
+	waveParams[i].w = 0.9;
+
+	curFileWaveParam << "defWaveParams[" << i << "] = " << "glm::vec4(" << waveParams[i].x << ", " << waveParams[i].y << ", " << waveParams[i].z << ", " << waveParams[i].w << "),\n";
+}
+
+startRef = glm::vec4(0.425f, 0.28318530718f / 1.5, sqrt(9.8 * 0.28318530718f / 1.5), 0.2);
+endRef = glm::vec4(0.225f, 0.5318530718f / 1.5, sqrt(9.8 * 0.5318530718f / 1.5), 0.2);
+
+
+for (int i = 60; i < 64; i++) {
+	rad = static_cast<float> (((rand() % 121) - 60) + ((static_cast <float> (rand())) / static_cast <float> (RAND_MAX)));
+	directions[i] = glm::mat2(glm::vec2(glm::cos(glm::radians(rad)), glm::sin(glm::radians(rad))), glm::vec2(-glm::sin(glm::radians(rad)), glm::cos(glm::radians(rad)))) * glm::vec2(1.0, 1.0);
+	curFileDirect << "defDirections[" << i << "] = " << "glm::vec2(" << directions[i].x << ", " << directions[i].y << "),\n";
+
+	waveParams[i].x = std::lerp(startRef.x, endRef.x, (static_cast<float> (i - 60) / 4.0f));
+	waveParams[i].y = std::lerp(startRef.y, endRef.y, (static_cast<float> (i - 60) / 4.0f));
+
+	waveParams[i].z = sqrt(9.8 * waveParams[i].y);
+	waveParams[i].w = 0.2;
+
+	curFileWaveParam << "defWaveParams[" << i << "] = " << "glm::vec4(" << waveParams[i].x << ", " << waveParams[i].y << ", " << waveParams[i].z << ", " << waveParams[i].w << "),\n";
+}
+
+curFileDirect.close();
+curFileDirect.close();

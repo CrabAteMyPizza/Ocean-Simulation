@@ -13,23 +13,23 @@ void dStoreAndUtils::generateWaveField(vecTexCoord waveField[], unsigned int ind
 	};
 
 	int firstSquare[6] = {
-		0, 1, 1751,
-		1751, 1752, 1
+		0, 1, 2049,
+		2049, 2050, 1
 	};
 
 	//Doing the tesellation for the vector fields of the wave.
 	int index = 0;
 	int indRow = 0, indInd = 0;
-	for (int i = 0; i < 1751; i++) {
+	for (int i = 0; i < 2049; i++) {
 		if(i == 1){
-			indRow = 1751;
+			indRow = 2049;
 		}
-		indRow = 1751 * i;
+		indRow = 2049 * i;
 
-		for (int j = 0; j < 1751; j++) {
+		for (int j = 0; j < 2049; j++) {
 
 			glm::mat4 matTransform = glm::mat4(1.0f);
-			glm::vec3 vectorTransform = glm::vec3((j * 0.05f), 0.0f, (i * -0.05f));
+			glm::vec3 vectorTransform = glm::vec3((j * 0.1f), 0.0f, (i * -0.1f));
 			glm::mat4 mat2DTransform = glm::mat4(1.0f);
 			glm::vec3 vector2DTransform = glm::vec3((j * 0.0014245014f), (i * 0.0014245014f), 0.0f);
 			matTransform = glm::translate(matTransform, vectorTransform);
@@ -43,7 +43,7 @@ void dStoreAndUtils::generateWaveField(vecTexCoord waveField[], unsigned int ind
 
 			index++;
 
-			if ((i < 1750) && (j < 1750)) {
+			if ((i < 2048) && (j < 2048)) {
 				for (int k = 0; k < 6; k++) {
 					indOrder[indInd] = firstSquare[k] + indRow + j;
 					indInd++;
@@ -114,48 +114,33 @@ void dStoreAndUtils::loadWaveNRM(std::string* nrmNames, unsigned int* waveNRMID,
 }
 
 //Generating random directions of the wave each time and also the parameters
-void dStoreAndUtils::generateDirectAndWaveParams(glm::vec2 directions[], glm::vec4 waveParams[], bool resDef) {
+void dStoreAndUtils::generateDirectAndWaveParams(glm::vec2 directions[], glm::vec4 waveParams[], glm::vec3 linearInterpolators[], int sections[], int divisorLen, bool resDef) {
 
 	if (!resDef) {
 		srand(time(NULL));
 		std::fstream curFileDirect, curFileWaveParam;
 		curFileDirect.open("stdDefaultsDirect.txt", std::fstream::out);
 		curFileWaveParam.open("stdDefaultsParam.txt", std::fstream::out);
-
-		glm::vec4 startRef = glm::vec4(0.0105f, 2.08318530718f, sqrt(9.8 * 2.08318530718f), 2.0);
-		glm::vec4 endRef = glm::vec4(0.0025f, 6.28318530718f, sqrt(9.8 * 6.28318530718f), 2.0);
 		float rad;
 
-		for (int i = 0; i < 32; i++) {
-			rad = static_cast<float> (((rand() % 121) - 60) + ((static_cast <float> (rand())) / static_cast <float> (RAND_MAX)));
-			directions[i] = glm::mat2(glm::vec2(glm::cos(glm::radians(rad)), glm::sin(glm::radians(rad))), glm::vec2(-glm::sin(glm::radians(rad)), glm::cos(glm::radians(rad)))) * glm::vec2(1.0, 1.0);
-			curFileDirect << "defDirections[" << i << "] = " << "glm::vec2(" << directions[i].x << ", " << directions[i].y << "),\n";
+		int ind = 0;
+		for (int i = 0; i < divisorLen; i++) {
 
-			waveParams[i].x = std::lerp(startRef.x, endRef.x, (static_cast<float> (i) / 62.0f));
-			waveParams[i].y = std::lerp(startRef.y, endRef.y, (static_cast<float> (i) / 62.0f));
+			for (int curPos = 0; curPos < sections[i]; curPos++) {
 
-			waveParams[i].z = sqrt(9.8 * waveParams[i].y);
-			waveParams[i].w = 2.0;
+				rad = static_cast<float> (((rand() % 211) - 105) + ((static_cast <float> (rand())) / static_cast <float> (RAND_MAX)));
+				directions[ind] = glm::mat2(glm::vec2(glm::cos(glm::radians(rad)), glm::sin(glm::radians(rad))), glm::vec2(-glm::sin(glm::radians(rad)), glm::cos(glm::radians(rad)))) * glm::vec2(1.0, 1.0);
+				curFileDirect << "defDirections[" << ind << "] = " << "glm::vec2(" << directions[ind].x << ", " << directions[ind].y << "),\n";
 
-			curFileWaveParam << "defWaveParams[" << i << "] = " << "glm::vec4(" << waveParams[i].x << ", " << waveParams[i].y << ", " << waveParams[i].z << ", " << waveParams[i].w << "),\n";
-		}
+				waveParams[ind].x = std::lerp(linearInterpolators[i].x, linearInterpolators[i + 1].x, (static_cast<float> (curPos + 1) / sections[i]));
+				waveParams[ind].y = std::lerp(linearInterpolators[i].y, linearInterpolators[i + 1].y, (static_cast<float> (curPos + 1) / sections[i]));
 
-		startRef = glm::vec4(0.325f, 0.28318530718f, sqrt(9.8 * 0.28318530718f), 1.0);
-		endRef = glm::vec4(0.125f, 0.5318530718f, sqrt(9.8 * 0.5318530718f), 1.0);
+				waveParams[ind].z = sqrt(9.8 * waveParams[ind].y);
+				waveParams[ind].w = linearInterpolators[i + 1].z;
 
-
-		for (int i = 32; i < 64; i++) {
-			rad = static_cast<float> (((rand() % 121) - 60) + ((static_cast <float> (rand())) / static_cast <float> (RAND_MAX)));
-			directions[i] = glm::mat2(glm::vec2(glm::cos(glm::radians(rad)), glm::sin(glm::radians(rad))), glm::vec2(-glm::sin(glm::radians(rad)), glm::cos(glm::radians(rad)))) * glm::vec2(1.0, 1.0);
-			curFileDirect << "defDirections[" << i << "] = " << "glm::vec2(" << directions[i].x << ", " << directions[i].y << "),\n";
-
-			waveParams[i].x = std::lerp(startRef.x, endRef.x, (static_cast<float> (i) / 32.0f));
-			waveParams[i].y = std::lerp(startRef.y, endRef.y, (static_cast<float> (i) / 32.0f));
-
-			waveParams[i].z = sqrt(9.8 * waveParams[i].y);
-			waveParams[i].w = 1.0;
-
-			curFileWaveParam << "defWaveParams[" << i << "] = " << "glm::vec4(" << waveParams[i].x << ", " << waveParams[i].y << ", " << waveParams[i].z << ", " << waveParams[i].w << "),\n";
+				curFileWaveParam << "defWaveParams[" << ind << "] = " << "glm::vec4(" << waveParams[ind].x << ", " << waveParams[ind].y << ", " << waveParams[ind].z << ", " << waveParams[ind].w << "),\n";
+				ind++;
+			}
 		}
 
 		curFileDirect.close();

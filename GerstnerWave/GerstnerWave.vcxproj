@@ -40,6 +40,12 @@
     <Text Include="VertexShaderGerstner.txt" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="Overcast-Cube-Map\behind.png" />
+    <Image Include="Overcast-Cube-Map\bottom.png" />
+    <Image Include="Overcast-Cube-Map\front.png" />
+    <Image Include="Overcast-Cube-Map\left.png" />
+    <Image Include="Overcast-Cube-Map\right.png" />
+    <Image Include="Overcast-Cube-Map\up.png" />
     <Image Include="Perturb_Nrm_Lg_1.png" />
     <Image Include="Perturb_Nrm_Lg_2.png" />
     <Image Include="Perturb_Nrm_Sm_1.png" />

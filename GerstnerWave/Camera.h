@@ -12,13 +12,13 @@
 class Camera {
 private:
     //Camera properties
-    const float cameraSpeed = 0.07f;
+    const float cameraSpeed = 0.7f;
     float yaw = -90.0f, pitch = 0.0f, fov = 45.0;
     float lastX, lastY;
     bool firstMouse = true;
     int width, height;
     float nearClipDist = 0.1f;
-    float farClipDist = 100.0f;
+    float farClipDist = 300.0f;
     Shader *assocShader;
 
     //Camera vectors

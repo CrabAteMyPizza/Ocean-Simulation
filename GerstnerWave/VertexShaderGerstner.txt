@@ -30,7 +30,7 @@ void main()
     vec2 sumOfWaves = vec2(0.0);
     vec4 derivSum = vec4(0.0);
 
-    for(int i = 0; i < 64; i++) {
+    for(int i = 0; i < 60; i++) {
         vec2 curDirection = normalize(Directions[i]);
         sumOfWaves.x += waveParams[i].w * InvSine(waveParams[i].x, waveParams[i].y, curDirection, aPos, time, waveParams[i].z);
         sumOfWaves.y += InvCosine(waveParams[i].x, waveParams[i].y, curDirection, aPos, time, waveParams[i].z);

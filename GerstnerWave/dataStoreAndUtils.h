@@ -207,7 +207,7 @@ public:
     // utility functions
     void generateWaveField(vecTexCoord waveField[], unsigned int indOrder[]);
     int loadSkybox(std::string mode);
-    void generateDirectAndWaveParams(glm::vec2 directions[], glm::vec4 waveParams[], bool resDef);
+    void generateDirectAndWaveParams(glm::vec2 directions[], glm::vec4 waveParams[], glm::vec3 linearInterpolators[], int sections[], int divisorLen, bool resDef);
     void loadWaveNRM(std::string *nrmNames, unsigned int *waveNRMID, int size);
 
     //Getter and Setter

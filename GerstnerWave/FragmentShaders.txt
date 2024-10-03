@@ -53,7 +53,7 @@ void main()
     normFast = tbnMat * normFast;
     normFast2 = tbnMat * normFast2;
 
-    vec3 norm = normalize(normal + normalize(normMed) + normalize(normLarge) + normalize(normFast) + normalize(normFast2));
+    vec3 norm = normalize(mix(normal, normalize(normalize(normMed) + normalize(normLarge) + normalize(normFast) + normalize(normFast2)), 0.6));
 
     vec3 result = CalcDirLight(dirLight, norm, fragPos);
     FragColor = vec4(result, 1.0);

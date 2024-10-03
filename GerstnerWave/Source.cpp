@@ -16,9 +16,9 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 
 //Stored in heap due to compiler suggestion and size
-//1 Tile has a resolution of 350 x 350.
-static dStoreAndUtils::vecTexCoord waveField[3066001];
-static unsigned int renderOrder[18375000];
+//1 Tile has a resolution of 350 x 350. or 256 x 256. current mode 256
+static dStoreAndUtils::vecTexCoord waveField[4198401];
+static unsigned int renderOrder[25165824];
 
 int main() {
 
@@ -48,6 +48,7 @@ int main() {
 	}
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
+	//The linear interpolation is wrong
 	//Generating the waveField and wave Parameters using class dStoreAndUtils
 	// ------------------------------- START -----------------------//
 	
@@ -56,7 +57,23 @@ int main() {
 
 	glm::vec2 directions[64];
 	glm::vec4 waveParams[64];
-	compartment.generateDirectAndWaveParams(directions, waveParams, true);
+
+	int sections[] = {44, 16, 4};
+	glm::vec3 linearInterpolators[] = {
+		glm::vec3(0.105f / 13.3, 0.28318530718f * 4.2, 1.1),
+		glm::vec3(0.057f / 13.3, 0.5318530718f * 4.2, 1.1),
+
+		glm::vec3(0.105f / 11.3, 0.28318530718f * 3.2, 1.3),
+		glm::vec3(0.057f / 11.3, 0.5318530718f * 3.2, 1.3),
+
+		glm::vec3(0.325f / 2.5, 0.28318530718f * 4.0, 1.8),
+		glm::vec3(0.125f / 2.5, 0.5318530718f * 4.0, 1.8)
+	};
+
+	//THis function is useful to separate wave categorizations
+	//Currecnt setting Big wave 4, small medium 28, smallest 32
+	//I tried to use beaufort scale
+	compartment.generateDirectAndWaveParams(directions, waveParams, linearInterpolators, sections, 3, false);
 
 	// -------------------------------  END ------------------------//
 
@@ -70,7 +87,7 @@ int main() {
 	Shader waveShader(vertPath, fragPath);
 	Shader skyboxShader(skyboxVertPath, skyboxFragPath);
 
-	unsigned int skyboxTexID = compartment.loadSkybox("Sunset");
+	unsigned int skyboxTexID = compartment.loadSkybox("Noon");
 
 	std::string nrmNames[] = { "Perturb_Nrm_Sm_1.png",  "Perturb_Nrm_Sm_2.png", "Perturb_Nrm_Lg_1.png", "Perturb_Nrm_Lg_2.png" };
 	unsigned int waveNRMID[4];
@@ -167,7 +184,12 @@ int main() {
 	glUniform3f(glGetUniformLocation(waveShader.ID, "dirLight.diffuse"), 1.0f, 1.0f, 1.0f);
 	glUniform3f(glGetUniformLocation(waveShader.ID, "dirLight.specular"), 0.5f, 0.5f, 0.5f);
 	glDepthFunc(GL_LEQUAL);
-	glm::vec3 curDir = glm::vec3(-1.08631f, -15.6359f, -25.7334f); //Sunset Alt 24.9743f, -4.14718f, 16.0384f Noon -1.08631f, -15.6359f, -25.7334f
+
+	//Sunset Alt 24.9743f, -4.14718f, 16.0384f
+	//Noon -1.08631f, -15.6359f, -25.7334f 
+	//Overcast 88.0172f, -204.781f, 127.704f
+	glm::vec3 curDir = glm::vec3(-1.08631f, -15.6359f, -25.7334f);
+
 	float startTime = glfwGetTime();
 
 	while (!glfwWindowShouldClose(window))
@@ -193,7 +215,7 @@ int main() {
 
 		glBindVertexArray(VAO[1]);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-		glDrawElements(GL_TRIANGLES, 18375000, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, 25165824, GL_UNSIGNED_INT, 0);
 
 		skyboxShader.use();
 		skyboxShader.setMatrix4X4("projection", 1, mainCamera.getProjectionMat());
@@ -219,7 +241,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 	glViewport(0, 0, width, height);
 }
 
-//Function to relay the information
+//Functions to relay the information
 void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
 	Camera* curCamPoint = (Camera*)glfwGetWindowUserPointer(window);
 	curCamPoint->mouse_callback(window, xpos, ypos);
