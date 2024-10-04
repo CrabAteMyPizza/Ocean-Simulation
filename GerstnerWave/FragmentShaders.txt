@@ -35,6 +35,7 @@ in vec2 tCoord;
 
 void main()
 {
+    /*disabled for now
     mat3 tbnMat = mat3(normalize(tangent), normalize(bitangent), normalize(normal));
 
     vec3 normMed = texture(waveNRM_0, vec2(tCoord.x - 0.713647, tCoord.y + 0.700505) + (0.022 * Time)).rgb;
@@ -53,7 +54,11 @@ void main()
     normFast = tbnMat * normFast;
     normFast2 = tbnMat * normFast2;
 
-    vec3 norm = normalize(mix(normal, normalize(normalize(normMed) + normalize(normLarge) + normalize(normFast) + normalize(normFast2)), 0.6));
+    smoehow disabling normal mapping make the whole thing a little bit better because of clairty?
+    Old way. It also save some resources
+    normalize(mix(normal, normalize(normalize(normMed) + normalize(normLarge) + normalize(normFast) + normalize(normFast2)), 0.6)) */
+
+    vec3 norm = normalize(normal);
 
     vec3 result = CalcDirLight(dirLight, norm, fragPos);
     FragColor = vec4(result, 1.0);
