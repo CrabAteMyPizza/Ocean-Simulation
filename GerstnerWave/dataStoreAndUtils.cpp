@@ -121,22 +121,24 @@ void dStoreAndUtils::generateDirectAndWaveParams(glm::vec2 directions[], glm::ve
 		std::fstream curFileDirect, curFileWaveParam;
 		curFileDirect.open("stdDefaultsDirect.txt", std::fstream::out);
 		curFileWaveParam.open("stdDefaultsParam.txt", std::fstream::out);
-		float rad;
+		float deg;
 
 		int ind = 0;
 		for (int i = 0; i < divisorLen; i++) {
 
 			for (int curPos = 0; curPos < sections[i]; curPos++) {
 
-				rad = static_cast<float> (((rand() % 211) - 105) + ((static_cast <float> (rand())) / static_cast <float> (RAND_MAX)));
-				directions[ind] = glm::mat2(glm::vec2(glm::cos(glm::radians(rad)), glm::sin(glm::radians(rad))), glm::vec2(-glm::sin(glm::radians(rad)), glm::cos(glm::radians(rad)))) * glm::vec2(1.0, 1.0);
+				deg = static_cast<float> (((rand() % 211) - 105) + ((static_cast <float> (rand())) / static_cast <float> (RAND_MAX)));
+				std::cout << deg << std::endl;
+				
+				directions[ind] = glm::mat2(glm::vec2(glm::cos(glm::radians(deg)), glm::sin(glm::radians(deg))), glm::vec2(-glm::sin(glm::radians(deg)), glm::cos(glm::radians(deg)))) * glm::vec2(1.0, 1.0);
 				curFileDirect << "defDirections[" << ind << "] = " << "glm::vec2(" << directions[ind].x << ", " << directions[ind].y << "),\n";
 
-				waveParams[ind].x = std::lerp(linearInterpolators[i].x, linearInterpolators[i + 1].x, (static_cast<float> (curPos + 1) / sections[i]));
-				waveParams[ind].y = std::lerp(linearInterpolators[i].y, linearInterpolators[i + 1].y, (static_cast<float> (curPos + 1) / sections[i]));
+				waveParams[ind].x = std::lerp(linearInterpolators[(2 * i)].x, linearInterpolators[(2 * i) + 1].x, (static_cast<float> (curPos + 1) / sections[i]));
+				waveParams[ind].y = std::lerp(linearInterpolators[(2 * i)].y, linearInterpolators[(2 * i) + 1].y, (static_cast<float> (curPos + 1) / sections[i]));
 
 				waveParams[ind].z = sqrt(9.8 * waveParams[ind].y);
-				waveParams[ind].w = linearInterpolators[i + 1].z;
+				waveParams[ind].w = linearInterpolators[(2 * i) + 1].z;
 
 				curFileWaveParam << "defWaveParams[" << ind << "] = " << "glm::vec4(" << waveParams[ind].x << ", " << waveParams[ind].y << ", " << waveParams[ind].z << ", " << waveParams[ind].w << "),\n";
 				ind++;

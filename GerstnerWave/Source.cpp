@@ -58,19 +58,16 @@ int main() {
 	glm::vec2 directions[64];
 	glm::vec4 waveParams[64];
 
-	int sections[] = {44, 16, 4};
+	int sections[] = {44, 20};
 	glm::vec3 linearInterpolators[] = {
 		glm::vec3(0.105f / 13.3, 0.28318530718f * 4.2, 2.1),
 		glm::vec3(0.057f / 13.3, 0.5318530718f * 4.2, 2.1),
 
 		glm::vec3(0.105f / 11.3, 0.28318530718f * 3.2, 1.3),
-		glm::vec3(0.057f / 11.3, 0.5318530718f * 3.2, 1.3),
-
-		glm::vec3(0.325f / 2.5, 0.28318530718f * 4.0, 1.8),
-		glm::vec3(0.125f / 2.5, 0.5318530718f * 4.0, 1.8)
+		glm::vec3(0.057f / 11.3, 0.5318530718f * 3.2, 1.3)
 	};
 
-	//THis function is useful to separate wave categorizations
+	//This function is useful to separate wave categorizations
 	//Currecnt setting Big wave 4, small medium 28, smallest 32
 	//I tried to use beaufort scale
 	compartment.generateDirectAndWaveParams(directions, waveParams, linearInterpolators, sections, 3, false);

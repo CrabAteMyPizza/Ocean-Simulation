@@ -1,5 +1,13 @@
 ﻿  Source.cpp
-C:\Users\HP\source\repos\GerstnerWave\GerstnerWave\Source.cpp(179,88): warning C4305: 'argument': truncation from 'double' to 'GLfloat'
-C:\Users\HP\source\repos\GerstnerWave\GerstnerWave\Source.cpp(193,18): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\HP\source\repos\GerstnerWave\GerstnerWave\Source.cpp(201,74): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\HP\source\repos\GerstnerWave\GerstnerWave\Source.cpp(176,88): warning C4305: 'argument': truncation from 'double' to 'GLfloat'
+C:\Users\HP\source\repos\GerstnerWave\GerstnerWave\Source.cpp(190,18): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\HP\source\repos\GerstnerWave\GerstnerWave\Source.cpp(198,74): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+  dataStoreAndUtils.cpp
+C:\Users\HP\source\repos\GerstnerWave\GerstnerWave\dataStoreAndUtils.cpp(120,13): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+C:\Users\HP\source\repos\GerstnerWave\GerstnerWave\dataStoreAndUtils.cpp(140,29): warning C4244: '=': conversion from 'double' to 'T', possible loss of data
+          with
+          [
+              T=float
+          ]
+  Generating Code...
   GerstnerWave.vcxproj -> C:\Users\HP\source\repos\GerstnerWave\x64\Debug\GerstnerWave.exe
